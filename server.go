@@ -139,6 +139,13 @@ func parseLine(html []byte) []byte {
 
 }
 
+func Middleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.RequestURI)
+		next.ServeHTTP(w, r)
+	})
+}
+
 func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
 }
@@ -163,12 +170,7 @@ func main() {
 	router := mux.NewRouter()
 	api := router.PathPrefix("/api").Subrouter()
 	api.NotFoundHandler = http.HandlerFunc(NotFoundHandler)
-	api.Use(func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			log.Println(r.RequestURI)
-			next.ServeHTTP(w, r)
-		})
-	})
+	api.Use(Middleware)
 
 	api1 := api.PathPrefix("/v1").Subrouter()
 	api1.HandleFunc("/stop/{stop:\\d{4}}", StopHandler)
