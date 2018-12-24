@@ -151,7 +151,6 @@ func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func StopHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	page := downloadStop(mux.Vars(r)["stop"])
 	js := parseStop(page)
@@ -159,7 +158,6 @@ func StopHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LineHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	page := downloadLine(mux.Vars(r)["line"])
 	js := parseLine(page)
