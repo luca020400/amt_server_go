@@ -170,7 +170,7 @@ func main() {
 		})
 	})
 
-	var api1 = api.PathPrefix("/v1").Subrouter()
+	api1 := api.PathPrefix("/v1").Subrouter()
 	api1.HandleFunc("/stop/{stop:[0-9]{4}}", StopHandler)
 	api1.HandleFunc("/line/{line:[0-9]{1,3}}", LineHandler)
 	api1.NotFoundHandler = http.HandlerFunc(NotFoundHandler)
