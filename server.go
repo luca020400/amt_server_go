@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -161,7 +160,6 @@ func LineHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	flag.Parse()
 	router := mux.NewRouter()
 	api := router.PathPrefix("/api").Subrouter()
 	api.NotFoundHandler = http.HandlerFunc(NotFoundHandler)
