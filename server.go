@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -174,6 +173,6 @@ func main() {
 		w.WriteHeader(http.StatusForbidden)
 	})
 
-	fmt.Println("Listening on port", port)
+	log.Println("Listening on port", port)
 	http.ListenAndServe(":"+port, router)
 }
