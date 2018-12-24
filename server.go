@@ -17,8 +17,8 @@ import (
 var (
 	port = "5555"
 
-	url_line  = "https://www.amt.genova.it/amt/servizi/orari_tel.php"
-	url_stops = "https://www.amt.genova.it/amt/simon.php?CodiceFermata="
+	urlLine = "https://www.amt.genova.it/amt/servizi/orari_tel.php"
+	urlStop = "https://www.amt.genova.it/amt/simon.php?CodiceFermata="
 )
 
 type StopData struct {
@@ -42,8 +42,8 @@ type Line struct {
 	Lines []LineData `json:"lines"`
 }
 
-func downloadStop(stop string) []byte {
-	resp, err := http.Get(url_stops + stop)
+func downloadStop(code string) []byte {
+	resp, err := http.Get(urlStop + code)
 	if err != nil {
 		// handle error
 	}
@@ -88,7 +88,7 @@ func downloadLine(line string) []byte {
 		"cmdOrari": {"Mostra Orari"},
 	}
 
-	resp, err := http.PostForm(url_line, formData)
+	resp, err := http.PostForm(urlLine, formData)
 	if err != nil {
 		// handle error
 	}
@@ -115,14 +115,14 @@ func parseLine(html []byte) []byte {
 	}
 
 	tables := doc.FindAll("table")
-	time_tables := tables[:0]
+	timeTables := tables[:0]
 	for _, table := range tables {
 		if len(table.FindAll("td")) != 0 {
-			time_tables = append(time_tables, table)
+			timeTables = append(timeTables, table)
 		}
 	}
 
-	for index, table := range time_tables {
+	for index, table := range timeTables {
 		var times []string
 		for _, td := range table.FindAll("td") {
 			times = append(times, td.Text())
