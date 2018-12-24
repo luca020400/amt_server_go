@@ -43,7 +43,7 @@ type Line struct {
 	Lines []LineData `json:"lines"`
 }
 
-func downloadStops(stop string) []byte {
+func downloadStop(stop string) []byte {
 	resp, err := http.Get(url_stops + stop)
 	if err != nil {
 		// handle error
@@ -57,7 +57,7 @@ func downloadStops(stop string) []byte {
 	return body
 }
 
-func parseStops(html []byte) []byte {
+func parseStop(html []byte) []byte {
 	doc := soup.HTMLParse(string(html))
 
 	var stopData []StopData
@@ -140,13 +140,31 @@ func parseLine(html []byte) []byte {
 
 }
 
+func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotFound)
+}
+
+func StopHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	page := downloadStop(mux.Vars(r)["stop"])
+	js := parseStop(page)
+	w.Write(js)
+}
+
+func LineHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	page := downloadLine(mux.Vars(r)["line"])
+	js := parseLine(page)
+	w.Write(js)
+}
+
 func main() {
 	flag.Parse()
 	router := mux.NewRouter()
 	api := router.PathPrefix("/api").Subrouter()
-	api.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusNotFound)
-	})
+	api.NotFoundHandler = http.HandlerFunc(NotFoundHandler)
 	api.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			log.Println(r.RequestURI)
@@ -155,23 +173,9 @@ func main() {
 	})
 
 	var api1 = api.PathPrefix("/v1").Subrouter()
-	api1.HandleFunc("/stop/{stop:[0-9]{4}}", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Header().Set("Content-Type", "application/json")
-		page := downloadStops(mux.Vars(r)["stop"])
-		js := parseStops(page)
-		w.Write(js)
-	})
-	api1.HandleFunc("/line/{line:[0-9]{1,3}}", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Header().Set("Content-Type", "application/json")
-		page := downloadLine(mux.Vars(r)["line"])
-		js := parseLine(page)
-		w.Write(js)
-	})
-	api1.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusForbidden)
-	})
+	api1.HandleFunc("/stop/{stop:[0-9]{4}}", StopHandler)
+	api1.HandleFunc("/line/{line:[0-9]{1,3}}", LineHandler)
+	api1.NotFoundHandler = http.HandlerFunc(NotFoundHandler)
 
 	log.Println("Listening on port", port)
 	http.ListenAndServe(":"+port, router)
