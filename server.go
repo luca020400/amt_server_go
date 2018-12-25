@@ -61,13 +61,13 @@ func parseStop(html []byte) []byte {
 
 	var stopData []StopData
 	for _, tr := range doc.FindAll("tr") {
-		var tds = tr.FindAll("td")
+		tds := tr.FindAll("td")
 		if len(tds) == 4 {
 			stopData = append(stopData, StopData{tds[0].Text(), tds[1].Text(), tds[2].Text(), tds[3].Text()})
 		}
 	}
 
-	var name = doc.FindAll("font")[1].Text()
+	name := doc.FindAll("font")[1].Text()
 
 	js, err := json.Marshal(Stop{name, stopData})
 	if err != nil {
