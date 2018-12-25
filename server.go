@@ -172,7 +172,7 @@ func main() {
 
 	api1 := api.PathPrefix("/v1").Subrouter()
 	api1.HandleFunc("/stop/{stop:\\d{4}}", StopHandler)
-	api1.HandleFunc("/line/{line:\\d{1,3}}", LineHandler)
+	api1.HandleFunc("/line/{line:[A-Z0-9]{1,3}}", LineHandler)
 	api1.NotFoundHandler = http.HandlerFunc(NotFoundHandler)
 
 	log.Println("Listening on port", port)
