@@ -59,6 +59,16 @@ func downloadStop(code string) []byte {
 func parseStop(html []byte) []byte {
 	doc := soup.HTMLParse(string(html))
 
+	names := doc.FindAll("font")
+	if len(names) != 3 {
+		// Non existing stop, craft an empty json
+		js, err := json.Marshal(Stop{})
+		if err != nil {
+			// handle error
+		}
+		return js
+	}
+
 	var stopData []StopData
 	for _, tr := range doc.FindAll("tr") {
 		tds := tr.FindAll("td")
@@ -67,7 +77,7 @@ func parseStop(html []byte) []byte {
 		}
 	}
 
-	name := doc.FindAll("font")[1].Text()
+	name := names[1].Text()
 
 	js, err := json.Marshal(Stop{name, stopData})
 	if err != nil {
